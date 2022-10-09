@@ -18,6 +18,6 @@ contract Creature is ERC721Tradable {
     }
 
     function contractURI() public pure returns (string memory) {
-        return <contractUrlHere>;
+        return "https://riselikephoenix.fun/item.png";
     }
 }

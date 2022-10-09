@@ -1,10 +1,12 @@
 const opensea = require("opensea-js");
-const OpenSeaPort = opensea.OpenSeaPort;
+console.log({ opensea });
+const OpenSeaSDK = opensea.OpenSeaSDK;
 const Network = opensea.Network;
-const MnemonicWalletSubprovider = require("@0x/subproviders")
-  .MnemonicWalletSubprovider;
+const MnemonicWalletSubprovider =
+  require("@0x/subproviders").MnemonicWalletSubprovider;
 const RPCSubprovider = require("web3-provider-engine/subproviders/rpc");
 const Web3ProviderEngine = require("web3-provider-engine");
+require("dotenv").config();
 
 const MNEMONIC = process.env.MNEMONIC;
 const NODE_API_KEY = process.env.INFURA_KEY || process.env.ALCHEMY_KEY;
@@ -42,7 +44,7 @@ const mnemonicWalletSubprovider = new MnemonicWalletSubprovider({
   baseDerivationPath: BASE_DERIVATION_PATH,
 });
 const network =
-  NETWORK === "mainnet" || NETWORK === "live" ? "mainnet" : "rinkeby";
+  NETWORK === "mainnet" || NETWORK === "live" ? "mainnet" : "goerli";
 const infuraRpcSubprovider = new RPCSubprovider({
   rpcUrl: isInfura
     ? "https://" + network + ".infura.io/v3/" + NODE_API_KEY
@@ -54,22 +56,22 @@ providerEngine.addProvider(mnemonicWalletSubprovider);
 providerEngine.addProvider(infuraRpcSubprovider);
 providerEngine.start();
 
-const seaport = new OpenSeaPort(
-  providerEngine,
-  {
-    networkName:
-      NETWORK === "mainnet" || NETWORK === "live"
-        ? Network.Main
-        : Network.Rinkeby,
-    apiKey: API_KEY,
-  },
-  (arg) => console.log(arg)
-);
+console.log({ OpenSeaSDK });
+
+const seaport = new OpenSeaSDK(providerEngine, {
+  networkName:
+    NETWORK === "mainnet" || NETWORK === "live"
+      ? Network.Main
+      : Network.Rinkeby,
+});
 
 async function main() {
   // Example: many fixed price auctions for a factory option.
-  console.log("Creating fixed price auctions...");
-  const fixedSellOrders = await seaport.createFactorySellOrders({
+  console.log("Creating fixed price auctions...", {
+    a: seaport,
+  });
+
+  console.log({
     assets: [
       {
         tokenId: FIXED_PRICE_OPTION_ID,
@@ -80,13 +82,23 @@ async function main() {
     startAmount: FIXED_PRICE,
     numberOfOrders: NUM_FIXED_PRICE_AUCTIONS,
   });
+
+  const fixedSellOrders = await seaport.createSellOrder({
+    asset: {
+      tokenId: FIXED_PRICE_OPTION_ID,
+      tokenAddress: FACTORY_CONTRACT_ADDRESS,
+    },
+    accountAddress: OWNER_ADDRESS,
+    startAmount: FIXED_PRICE,
+    numberOfOrders: NUM_FIXED_PRICE_AUCTIONS,
+  });
   console.log(
     `Successfully made ${fixedSellOrders.length} fixed-price sell orders! ${fixedSellOrders[0].asset.openseaLink}\n`
   );
 
   // Example: many fixed price auctions for multiple factory options.
   console.log("Creating fixed price auctions...");
-  const fixedSellOrdersTwo = await seaport.createFactorySellOrders({
+  const fixedSellOrdersTwo = await seaport.createSellOrder({
     assets: [
       { tokenId: "3", tokenAddress: FACTORY_CONTRACT_ADDRESS },
       { tokenId: "4", tokenAddress: FACTORY_CONTRACT_ADDRESS },
@@ -107,7 +119,7 @@ async function main() {
 
   // Expire one day from now
   const expirationTime = Math.round(Date.now() / 1000 + 60 * 60 * 24);
-  const dutchSellOrders = await seaport.createFactorySellOrders({
+  const dutchSellOrders = await seaport.createSellOrder({
     assets: [
       {
         tokenId: DUTCH_AUCTION_OPTION_ID,

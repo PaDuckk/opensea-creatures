@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import "./common/meta-transactions/ContentMixin.sol";
 import "./common/meta-transactions/NativeMetaTransaction.sol";
+import "./library/Base64.sol";
 
 contract OwnableDelegateProxy {}
 
@@ -68,7 +69,20 @@ abstract contract ERC721Tradable is ERC721, ContextMixin, NativeMetaTransaction,
     function baseTokenURI() virtual public pure returns (string memory);
 
     function tokenURI(uint256 _tokenId) override public pure returns (string memory) {
-        return string(abi.encodePacked(baseTokenURI(), Strings.toString(_tokenId)));
+         return string(
+            abi.encodePacked(
+                "data:application/json;base64,",
+                Base64.encode(
+                    bytes(
+                        abi.encodePacked(
+                            '{"name":"', 'test',
+                            '", "description": "', 'test description', Strings.toString(_tokenId), '"',
+                            ', "image":"', 'https://riselikephoenix.fun/item.png', '"}'
+                        )
+                    )
+                )
+            )
+        );
     }
 
     /**

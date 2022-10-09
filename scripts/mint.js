@@ -1,5 +1,7 @@
 const HDWalletProvider = require("truffle-hdwallet-provider");
 const web3 = require("web3");
+require("dotenv").config();
+
 const MNEMONIC = process.env.MNEMONIC;
 const NODE_API_KEY = process.env.INFURA_KEY || process.env.ALCHEMY_KEY;
 const isInfura = !!process.env.INFURA_KEY;
@@ -7,8 +9,8 @@ const FACTORY_CONTRACT_ADDRESS = process.env.FACTORY_CONTRACT_ADDRESS;
 const NFT_CONTRACT_ADDRESS = process.env.NFT_CONTRACT_ADDRESS;
 const OWNER_ADDRESS = process.env.OWNER_ADDRESS;
 const NETWORK = process.env.NETWORK;
-const NUM_CREATURES = 12;
-const NUM_LOOTBOXES = 4;
+const NUM_CREATURES = 5;
+const NUM_LOOTBOXES = 0;
 const DEFAULT_OPTION_ID = 0;
 const LOOTBOX_OPTION_ID = 2;
 
@@ -59,7 +61,7 @@ const FACTORY_ABI = [
 
 async function main() {
   const network =
-    NETWORK === "mainnet" || NETWORK === "live" ? "mainnet" : "rinkeby";
+    NETWORK === "mainnet" || NETWORK === "live" ? "mainnet" : "goerli";
   const provider = new HDWalletProvider(
     MNEMONIC,
     isInfura
